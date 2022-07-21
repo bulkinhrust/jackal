@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 import classes from './App.module.scss';
 import Cell from '../Cell';
-import { Field } from '../../types/Field';
+import { CellType } from '../../types/Cell';
+import { useIslandContext } from '../../context/IslandContext';
 
-const SIZE = 5;
 const TREASURE = 8; // 1
 const CANNIBAL = 2; // -1
 
-const fillByValue = (fieldsNumber: number, value: number, fieldArray: Field[]) => {
+const fillByValue = (fieldsNumber: number, value: number, fieldArray: CellType[], size: number) => {
   for (let i = 0; i < fieldsNumber;) {
-    const x = Math.floor(Math.random() * SIZE);
-    const y = Math.floor(Math.random() * SIZE);
-    const key = y * SIZE + x;
+    const x = Math.floor(Math.random() * size);
+    const y = Math.floor(Math.random() * size);
+    const key = y * size + x;
     if (fieldArray[key].value !== 0) {
       continue;
     }
@@ -26,25 +26,26 @@ const fillByValue = (fieldsNumber: number, value: number, fieldArray: Field[]) =
 };
 
 const App: React.FC = () => {
-  const [map, setMap] = useState<Field[]>([]);
+  const [island, setIsland] = useState<CellType[]>([]);
+  const { size } = useIslandContext();
 
   useEffect(() => {
-    let result: Field[] = new Array(SIZE * SIZE).fill(0).map((_, key) => ({
-      place: `${key}`,
+    let result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
+      place: key,
       value: 0,
       isClosed: true,
     }));
     // наполнение поля сокровищами
-    fillByValue(TREASURE, 1, result);
+    fillByValue(TREASURE, 1, result, size);
     // наполнение поля людоедами
-    fillByValue(CANNIBAL, -1, result);
-    setMap(result);
-  }, []);
+    fillByValue(CANNIBAL, -1, result, size);
+    setIsland(result);
+  }, []); // eslint-disable react-hooks/exhaustive-deps
 
   return (
     <div className={classes.component}>
-      {map.map((field) => (
-        <Cell key={field.place} field={field} />
+      {island.map((cell) => (
+        <Cell key={cell.place} cell={cell}/>
       ))}
     </div>
   );
