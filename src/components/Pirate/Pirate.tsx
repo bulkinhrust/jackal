@@ -10,18 +10,18 @@ type Props = {
 
 const Pirate: React.FC<Props> = (props) => {
   const { pirate } = props;
-  const { activePirate, setActivePirate } = useIslandContext();
+  const { activePirate, handleSetActivePirate } = useIslandContext();
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
     if (activePirate !== pirate.name && ref.current) {
       ref.current.focus();
     }
-    setActivePirate?.(activePirate === pirate.name ? undefined : pirate.name);
+    handleSetActivePirate(pirate);
   };
 
   const onBlur = () => {
-    setActivePirate(undefined);
+    handleSetActivePirate(undefined);
   };
 
   return (

@@ -20,7 +20,7 @@ const Cell: React.FC<Props> = (props) => {
   const {
     cell: { place, value, isClosed },
   } = props;
-  const { pirates } = useIslandContext();
+  const { pirates, availablePaths } = useIslandContext();
   const piratesHere = pirates.filter(({ location }) => location === place);
 
   return (
@@ -31,9 +31,10 @@ const Cell: React.FC<Props> = (props) => {
         classes.component,
         classes[style[`${value}`]],
         classes[isClosed ? 'closed' : ''],
+        classes[availablePaths.includes(place) ? 'available' : ''],
       )}
     >
-      {piratesHere.map((pirate) => (<Pirate pirate={pirate} />))}
+      {piratesHere.map((pirate) => (<Pirate key={pirate.name} pirate={pirate} />))}
       {isClosed ? '' : value}
     </div>
   );
