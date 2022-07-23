@@ -11,6 +11,7 @@ const fillFieldWithValue = (fieldsNumber: number, value: number, fieldArray: Cel
     fieldArray[key] = {
       ...fieldArray[key],
       value,
+      coins: value === 1 ? 1 : 0,
     };
     ++i;
   }

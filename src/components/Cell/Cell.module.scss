@@ -3,6 +3,7 @@
   height: 100px;
   border: 1px solid #ccc;
   display: flex;
+  position: relative;
 }
 
 .treasure {
@@ -22,6 +23,21 @@
   cursor: pointer;
 }
 
+.coin {
+  position: absolute;
+  left: 45%;
+  bottom: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: gold;
+  border: 2px solid #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 @for $i from 1 through 3 {
   .pirates_#{$i} {
     margin: auto;
@@ -29,6 +45,6 @@
     display: grid;
     align-items: center;
     justify-items: center;
-    grid-template-columns: repeat($i, 20px);
+    grid-template-columns: repeat($i, 30px);
   }
 }
