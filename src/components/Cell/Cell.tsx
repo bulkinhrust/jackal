@@ -10,7 +10,7 @@ type Props = {
   cell: CellType;
   pirates: PirateType[];
   isAvailable: boolean;
-  movePirate: (cell: number) => void;
+  movePirate: (cell: CellType) => void;
   handleSetActivePirate: (pirate?: PirateType) => void;
 };
 
@@ -22,7 +22,7 @@ const style: { [key: string]: string } = {
 
 const Cell: React.FC<Props> = (props) => {
   const {
-    cell: { place, value, isClosed },
+    cell, cell: { place, value, isClosed },
     pirates,
     isAvailable,
     movePirate,
@@ -31,7 +31,7 @@ const Cell: React.FC<Props> = (props) => {
 
   const handleClick = () => {
     if (isAvailable) {
-      movePirate(place);
+      movePirate(cell);
     }
     handleSetActivePirate(undefined);
   }
@@ -48,8 +48,9 @@ const Cell: React.FC<Props> = (props) => {
         classes[isAvailable ? 'available' : ''],
       )}
     >
-      {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
-      {isClosed ? '' : value}
+      {pirates.length > 0 && <div className={classes[`pirates_${pirates.length}`]}>
+        {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
+      </div>}
     </div>
   );
 };
