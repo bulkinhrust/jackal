@@ -21,6 +21,7 @@ const IslandContext = React.createContext<ContextType>({} as ContextType);
 const initialPirates = [
   { name: 'Jon', location: 0, color: '#200772' },
   { name: 'Jane', location: 24, color: '#A64B00' },
+  { name: 'Jack', location: 11, color: '#006363' },
 ];
 
 const TREASURE = 8; // 1

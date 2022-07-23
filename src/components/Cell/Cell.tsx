@@ -48,8 +48,9 @@ const Cell: React.FC<Props> = (props) => {
         classes[isAvailable ? 'available' : ''],
       )}
     >
-      {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
-      {isClosed ? '' : value}
+      {pirates.length > 0 && <div className={classes[`pirates_${pirates.length}`]}>
+        {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
+      </div>}
     </div>
   );
 };
