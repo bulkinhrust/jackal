@@ -10,16 +10,21 @@ type Props = {
 
 const Pirate: React.FC<Props> = (props) => {
   const { pirate } = props;
-  const { activePirate, handleSetActivePirate } = useIslandContext();
+  const { activePirate, handleSetActivePirate, throwCoin } = useIslandContext();
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+  const handleClick: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     if (activePirate?.name !== pirate.name && ref.current) {
       ref.current.focus();
     }
     handleSetActivePirate(pirate);
   };
+
+  const handleClickCoin: React.MouseEventHandler = (e) => {
+    e.stopPropagation();
+    throwCoin(pirate);
+  }
 
   return (
     <div
@@ -36,7 +41,7 @@ const Pirate: React.FC<Props> = (props) => {
           stroke={activePirate?.name === pirate.name ? '#4DC868' : '#fff'}
           strokeWidth="2"
         />
-        {pirate.withCoin && <circle cx="33" cy="40" r="9" fill="#FFD700" stroke="white" strokeWidth="2"/>}
+        {pirate.withCoin && <circle cx="33" cy="40" r="9" fill="#FFD700" stroke="white" strokeWidth="2" onClick={handleClickCoin} />}
       </svg>
 
     </div>

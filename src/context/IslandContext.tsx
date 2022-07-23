@@ -15,6 +15,7 @@ type ContextType = {
   setPirates: (pirates: PirateType[]) => void;
   movePirate: (cell: CellType) => void;
   pickUpCoin: (cell: CellType) => void;
+  throwCoin: (pirate: PirateType) => void;
 };
 
 const IslandContext = React.createContext<ContextType>({} as ContextType);
@@ -90,6 +91,17 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     ));
   }
 
+  const throwCoin = (currentPirate: PirateType) => {
+    setPirates(pirates.map((pirate) => pirate.name === currentPirate.name
+      ? { ...pirate, withCoin: false }
+      : pirate
+    ));
+    setIsland(island.map((islandCell) => islandCell.place === currentPirate.location
+      ? { ...islandCell, coins: islandCell.coins + 1 }
+      : islandCell
+    ));
+  }
+
   const value = {
     island,
     size,
@@ -100,6 +112,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     setPirates,
     movePirate,
     pickUpCoin,
+    throwCoin,
   }
   return (<IslandContext.Provider value={value}>
     {children}

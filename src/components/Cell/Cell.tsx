@@ -36,7 +36,7 @@ const Cell: React.FC<Props> = (props) => {
     handleSetActivePirate(undefined);
   }
 
-  const handleCoinClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+  const handleCoinClick: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     if (isAvailable) {
       handleClick();
