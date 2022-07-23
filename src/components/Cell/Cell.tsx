@@ -1,17 +1,13 @@
-import React, { memo } from 'react';
+import React, { useMemo } from 'react';
 import clsx from 'clsx';
 
 import classes from './Cell.module.scss';
 import { CellType } from '../../types/Cell';
 import Pirate from '../Pirate';
-import { PirateType } from '../../types/Pirate';
+import { useIslandContext } from '../../context/IslandContext';
 
 type Props = {
   cell: CellType;
-  pirates: PirateType[];
-  isAvailable: boolean;
-  movePirate: (cell: CellType) => void;
-  handleSetActivePirate: (pirate?: PirateType) => void;
 };
 
 const style: { [key: string]: string } = {
@@ -22,18 +18,31 @@ const style: { [key: string]: string } = {
 
 const Cell: React.FC<Props> = (props) => {
   const {
-    cell, cell: { place, value, isClosed },
-    pirates,
-    isAvailable,
-    movePirate,
-    handleSetActivePirate,
+    cell, cell: { place, value, isClosed, coins },
   } = props;
+
+  const {
+    pirates, availablePaths,
+    movePirate, handleSetActivePirate, pickUpCoin,
+  } = useIslandContext();
+
+  const piratesHere = pirates.filter(({ location }) => location === cell.place);
+  const isAvailable = useMemo(() => availablePaths.includes(cell.place), [availablePaths]);
 
   const handleClick = () => {
     if (isAvailable) {
       movePirate(cell);
     }
     handleSetActivePirate(undefined);
+  }
+
+  const handleCoinClick: React.MouseEventHandler<HTMLDivElement> = (e) => {
+    e.stopPropagation();
+    if (isAvailable) {
+      handleClick();
+      return;
+    }
+    pickUpCoin(cell);
   }
 
   return (
@@ -48,15 +57,12 @@ const Cell: React.FC<Props> = (props) => {
         classes[isAvailable ? 'available' : ''],
       )}
     >
-      {pirates.length > 0 && <div className={classes[`pirates_${pirates.length}`]}>
-        {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
+      {piratesHere.length > 0 && <div className={classes[`pirates_${piratesHere.length}`]}>
+        {piratesHere.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
       </div>}
+      {coins > 0 && !isClosed && <div className={classes.coin} onClick={handleCoinClick} />}
     </div>
   );
 };
 
-const isEqual = (prev: Props, next: Props) => (
-  prev.isAvailable === next.isAvailable && prev.pirates?.length === next.pirates?.length
-);
-
-export default memo(Cell, isEqual);
+export default Cell;
