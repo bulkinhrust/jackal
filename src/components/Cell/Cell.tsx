@@ -60,7 +60,7 @@ const Cell: React.FC<Props> = (props) => {
       {piratesHere.length > 0 && <div className={classes[`pirates_${piratesHere.length}`]}>
         {piratesHere.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
       </div>}
-      {coins > 0 && !isClosed && <div className={classes.coin} onClick={handleCoinClick} />}
+      {coins > 0 && !isClosed && <div className={classes.coin} onClick={handleCoinClick}>{coins}</div>}
     </div>
   );
 };

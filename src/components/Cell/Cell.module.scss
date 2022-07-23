@@ -33,6 +33,9 @@
   background-color: gold;
   border: 2px solid #fff;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @for $i from 1 through 3 {
