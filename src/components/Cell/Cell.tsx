@@ -20,18 +20,28 @@ const Cell: React.FC<Props> = (props) => {
   const {
     cell: { place, value, isClosed },
   } = props;
-  const { pirates, availablePaths } = useIslandContext();
+  const { pirates, availablePaths, movePirate, handleSetActivePirate } = useIslandContext();
   const piratesHere = pirates.filter(({ location }) => location === place);
+
+  const isAvailable = availablePaths.includes(place);
+
+  const handleClick = () => {
+    if (isAvailable) {
+      movePirate(place);
+    }
+    handleSetActivePirate(undefined);
+  }
 
   return (
     <div
       key={place}
       id={`${place}`}
+      onClick={handleClick}
       className={clsx(
         classes.component,
         classes[style[`${value}`]],
         classes[isClosed ? 'closed' : ''],
-        classes[availablePaths.includes(place) ? 'available' : ''],
+        classes[isAvailable ? 'available' : ''],
       )}
     >
       {piratesHere.map((pirate) => (<Pirate key={pirate.name} pirate={pirate} />))}
