@@ -27,7 +27,10 @@ const fillByValue = (fieldsNumber: number, value: number, fieldArray: CellType[]
 
 const App: React.FC = () => {
   const [island, setIsland] = useState<CellType[]>([]);
-  const { size } = useIslandContext();
+  const {
+    size, pirates, availablePaths,
+    movePirate, handleSetActivePirate,
+  } = useIslandContext();
 
   useEffect(() => {
     let result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
@@ -45,7 +48,14 @@ const App: React.FC = () => {
   return (
     <div className={classes.component}>
       {island.map((cell) => (
-        <Cell key={cell.place} cell={cell}/>
+        <Cell
+          key={cell.place}
+          cell={cell}
+          pirates={pirates.filter(({ location }) => location === cell.place)}
+          isAvailable={availablePaths.includes(cell.place)}
+          movePirate={movePirate}
+          handleSetActivePirate={handleSetActivePirate}
+        />
       ))}
     </div>
   );

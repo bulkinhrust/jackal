@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { memo } from 'react';
 import clsx from 'clsx';
 
 import classes from './Cell.module.scss';
 import { CellType } from '../../types/Cell';
 import Pirate from '../Pirate';
-import {useIslandContext} from '../../context/IslandContext';
+import { PirateType } from '../../types/Pirate';
 
 type Props = {
   cell: CellType;
+  pirates: PirateType[];
+  isAvailable: boolean;
+  movePirate: (cell: number) => void;
+  handleSetActivePirate: (pirate?: PirateType) => void;
 };
 
 const style: { [key: string]: string } = {
@@ -19,11 +23,11 @@ const style: { [key: string]: string } = {
 const Cell: React.FC<Props> = (props) => {
   const {
     cell: { place, value, isClosed },
+    pirates,
+    isAvailable,
+    movePirate,
+    handleSetActivePirate,
   } = props;
-  const { pirates, availablePaths, movePirate, handleSetActivePirate } = useIslandContext();
-  const piratesHere = pirates.filter(({ location }) => location === place);
-
-  const isAvailable = availablePaths.includes(place);
 
   const handleClick = () => {
     if (isAvailable) {
@@ -44,10 +48,14 @@ const Cell: React.FC<Props> = (props) => {
         classes[isAvailable ? 'available' : ''],
       )}
     >
-      {piratesHere.map((pirate) => (<Pirate key={pirate.name} pirate={pirate} />))}
+      {pirates.map((pirate) => <Pirate key={pirate.name} pirate={pirate} />)}
       {isClosed ? '' : value}
     </div>
   );
 };
 
-export default Cell;
+const isEqual = (prev: Props, next: Props) => (
+  prev.isAvailable === next.isAvailable && prev.pirates?.length === next.pirates?.length
+);
+
+export default memo(Cell, isEqual);
