@@ -1,12 +1,14 @@
 import React, {useContext, useEffect, useState} from 'react';
 
-import { PirateType } from '../types/Pirate';
+import PirateType from '../types/Pirate';
 import getAvailablePaths from './utils/getAvailablePaths';
 import fillFieldWithValue from './utils/fillFieldWithValue';
-import { CellType } from '../types/Cell';
+import CellType from '../types/Cell';
+import SeaCell from '../types/SeaCell';
 
 type ContextType = {
   island: CellType[];
+  sea: SeaCell[][];
   size: number;
   activePirate?: PirateType;
   pirates: PirateType[];
@@ -32,13 +34,14 @@ const CANNIBAL = 2; // -1
 export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const size = 5;
   const [island, setIsland] = useState<CellType[]>([]);
+  const [sea, setSea] = useState<SeaCell[][]>([[], []]);
   const [activePirate, setActivePirate] = useState<PirateType>();
   const [pirates, setPirates] = useState<PirateType[]>(initialPirates);
   const [availablePaths, setAvailablePaths] = useState<number[]>([]);
 
   useEffect(() => {
-    let result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
-      place: key,
+    const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
+      coordinate: key,
       value: 0,
       isClosed: true,
       coins: 0,
@@ -47,6 +50,12 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     fillFieldWithValue(TREASURE, 1, result, size);
     // наполнение поля людоедами
     fillFieldWithValue(CANNIBAL, -1, result, size);
+
+    const initSea = new Array(size).fill(0).map((_, key) => ({
+      coordinate: key,
+    }));
+
+    setSea([initSea, initSea]);
     setIsland(result);
   }, []); // eslint-disable react-hooks/exhaustive-deps
 
@@ -62,11 +71,11 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
 
   const movePirate = (cell: CellType) => {
     setPirates(pirates.map((pirate) => (pirate.name === activePirate?.name
-      ? { ...pirate, location: cell.place }
+      ? { ...pirate, location: cell.coordinate }
       : pirate
     )));
     if (cell.isClosed) {
-      setIsland(island.map((islandCell) => islandCell.place === cell.place
+      setIsland(island.map((islandCell) => islandCell.coordinate === cell.coordinate
         ? { ...islandCell, isClosed: false }
         : islandCell
       ))
@@ -77,7 +86,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     if (!activePirate || activePirate.withCoin) {
       return;
     }
-    if (activePirate.location !== cell.place) {
+    if (activePirate.location !== cell.coordinate) {
       setActivePirate(undefined);
       return;
     }
@@ -85,7 +94,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...pirate, withCoin: true }
       : pirate
     ));
-    setIsland(island.map((islandCell) => islandCell.place === cell.place
+    setIsland(island.map((islandCell) => islandCell.coordinate === cell.coordinate
       ? { ...islandCell, coins: islandCell.coins - 1 }
       : islandCell
     ));
@@ -96,7 +105,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...pirate, withCoin: false }
       : pirate
     ));
-    setIsland(island.map((islandCell) => islandCell.place === currentPirate.location
+    setIsland(island.map((islandCell) => islandCell.coordinate === currentPirate.location
       ? { ...islandCell, coins: islandCell.coins + 1 }
       : islandCell
     ));
@@ -104,6 +113,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
 
   const value = {
     island,
+    sea,
     size,
     activePirate,
     pirates,
