@@ -48,7 +48,7 @@ const Cell: React.FC<Props> = (props) => {
   return (
     <div
       key={coordinate}
-      id={`${coordinate}`}
+      id={coordinate}
       onClick={handleClick}
       className={clsx(
         classes.component,

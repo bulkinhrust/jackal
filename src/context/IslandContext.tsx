@@ -12,10 +12,10 @@ type ContextType = {
   size: number;
   activePirate?: PirateType;
   pirates: PirateType[];
-  availablePaths: (number | string)[];
+  availablePaths: string[];
   handleSetActivePirate: (pirate?: PirateType) => void;
   setPirates: (pirates: PirateType[]) => void;
-  movePirate: (cell: CellType) => void;
+  movePirate: (cell: CellType | SeaCell) => void;
   pickUpCoin: (cell: CellType) => void;
   throwCoin: (pirate: PirateType) => void;
 };
@@ -23,9 +23,9 @@ type ContextType = {
 const IslandContext = React.createContext<ContextType>({} as ContextType);
 
 const initialPirates = [
-  { name: 'Jon', location: 0, color: '#200772' },
-  { name: 'Jane', location: 24, color: '#A64B00' },
-  { name: 'Jack', location: 11, color: '#006363' },
+  { name: 'Jon', location: '0', color: '#200772' },
+  { name: 'Jane', location: '24', color: '#A64B00' },
+  { name: 'Jack', location: '11', color: '#006363' },
 ];
 
 const TREASURE = 8; // 1
@@ -37,11 +37,11 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const [sea, setSea] = useState<SeaCell[][]>([[], []]);
   const [activePirate, setActivePirate] = useState<PirateType>();
   const [pirates, setPirates] = useState<PirateType[]>(initialPirates);
-  const [availablePaths, setAvailablePaths] = useState<(number | string)[]>([]);
+  const [availablePaths, setAvailablePaths] = useState<string[]>([]);
 
   useEffect(() => {
     const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
-      coordinate: key,
+      coordinate: `${key}`,
       value: 0,
       isClosed: true,
       coins: 0,
@@ -52,7 +52,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     fillFieldWithValue(CANNIBAL, -1, result, size);
 
     const initSea = (ship: number) => new Array(size).fill(0).map((_, key) => ({
-      coordinate: `${ship}${key}`,
+      coordinate: `-${ship}${key}`,
       withShip: Math.floor(size / 2) === key,
     }));
 
@@ -70,12 +70,12 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     }
   };
 
-  const movePirate = (cell: CellType) => {
+  const movePirate = (cell: CellType | SeaCell) => {
     setPirates(pirates.map((pirate) => (pirate.name === activePirate?.name
       ? { ...pirate, location: cell.coordinate }
       : pirate
     )));
-    if (cell.isClosed) {
+    if ((cell as CellType).isClosed) {
       setIsland(island.map((islandCell) => islandCell.coordinate === cell.coordinate
         ? { ...islandCell, isClosed: false }
         : islandCell

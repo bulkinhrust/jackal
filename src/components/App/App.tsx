@@ -11,16 +11,13 @@ const App: React.FC = () => {
   return (
     <div className={classes.component}>
       {sea[0].map((cell) => (
-        <SeaCell cell={cell} />
+        <SeaCell key={cell.coordinate} cell={cell} />
       ))}
       {island.map((cell) => (
-        <Cell
-          key={cell.coordinate}
-          cell={cell}
-        />
+        <Cell key={cell.coordinate} cell={cell} />
       ))}
       {sea[1].map((cell) => (
-        <SeaCell cell={cell} />
+        <SeaCell key={cell.coordinate} cell={cell} />
       ))}
     </div>
   );

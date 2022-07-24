@@ -1,5 +1,5 @@
 type CellType = {
-  coordinate: number,
+  coordinate: string,
   value: number,
   isClosed: boolean,
   coins: number,
