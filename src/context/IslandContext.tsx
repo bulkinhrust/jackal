@@ -12,7 +12,7 @@ type ContextType = {
   size: number;
   activePirate?: PirateType;
   pirates: PirateType[];
-  availablePaths: number[];
+  availablePaths: (number | string)[];
   handleSetActivePirate: (pirate?: PirateType) => void;
   setPirates: (pirates: PirateType[]) => void;
   movePirate: (cell: CellType) => void;
@@ -37,7 +37,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const [sea, setSea] = useState<SeaCell[][]>([[], []]);
   const [activePirate, setActivePirate] = useState<PirateType>();
   const [pirates, setPirates] = useState<PirateType[]>(initialPirates);
-  const [availablePaths, setAvailablePaths] = useState<number[]>([]);
+  const [availablePaths, setAvailablePaths] = useState<(number | string)[]>([]);
 
   useEffect(() => {
     const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
@@ -51,11 +51,12 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     // наполнение поля людоедами
     fillFieldWithValue(CANNIBAL, -1, result, size);
 
-    const initSea = new Array(size).fill(0).map((_, key) => ({
-      coordinate: key,
+    const initSea = (ship: number) => new Array(size).fill(0).map((_, key) => ({
+      coordinate: `${ship}${key}`,
+      withShip: Math.floor(size / 2) === key,
     }));
 
-    setSea([initSea, initSea]);
+    setSea([initSea(0), initSea(1)]);
     setIsland(result);
   }, []); // eslint-disable react-hooks/exhaustive-deps
 
@@ -65,7 +66,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       setAvailablePaths([]);
     } else {
       setActivePirate(pirate);
-      setAvailablePaths(getAvailablePaths(pirate.location, size))
+      setAvailablePaths(getAvailablePaths(pirate.location, size, sea))
     }
   };
 

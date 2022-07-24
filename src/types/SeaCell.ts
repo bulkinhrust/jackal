@@ -1,5 +1,6 @@
 type SeaCellType = {
-  coordinate: number;
+  coordinate: string;
+  withShip?: boolean;
 };
 
 export default SeaCellType;
