@@ -52,11 +52,11 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     fillFieldWithValue(CANNIBAL, -1, result, size);
 
     const initSea = (ship: number) => new Array(size).fill(0).map((_, key) => ({
-      coordinate: `-${ship}${key}`,
+      coordinate: `-${ship}-${size * ship + key}`,
       withShip: Math.floor(size / 2) === key,
     }));
 
-    setSea([initSea(0), initSea(1)]);
+    setSea([initSea(0), initSea(size - 1)]);
     setIsland(result);
   }, []); // eslint-disable react-hooks/exhaustive-deps
 
