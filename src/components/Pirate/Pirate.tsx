@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 
 import classes from './Pirate.module.scss';
 import { useIslandContext } from '../../context/IslandContext';
-import { PirateType } from '../../types/Pirate';
+import PirateType from '../../types/Pirate';
 
 type Props = {
   pirate: PirateType;

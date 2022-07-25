@@ -1,4 +1,4 @@
-import { CellType } from '../../types/Cell';
+import CellType from '../../types/Cell';
 
 const fillFieldWithValue = (fieldsNumber: number, value: number, fieldArray: CellType[], size: number) => {
   for (let i = 0; i < fieldsNumber;) {

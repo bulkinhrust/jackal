@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import clsx from 'clsx';
 
 import classes from './Cell.module.scss';
-import { CellType } from '../../types/Cell';
+import CellType from '../../types/Cell';
 import Pirate from '../Pirate';
 import { useIslandContext } from '../../context/IslandContext';
 
@@ -18,7 +18,7 @@ const style: { [key: string]: string } = {
 
 const Cell: React.FC<Props> = (props) => {
   const {
-    cell, cell: { place, value, isClosed, coins },
+    cell, cell: { coordinate, value, isClosed, coins },
   } = props;
 
   const {
@@ -26,8 +26,8 @@ const Cell: React.FC<Props> = (props) => {
     movePirate, handleSetActivePirate, pickUpCoin,
   } = useIslandContext();
 
-  const piratesHere = pirates.filter(({ location }) => location === cell.place);
-  const isAvailable = useMemo(() => availablePaths.includes(cell.place), [availablePaths]);
+  const piratesHere = pirates.filter(({ location }) => location === coordinate);
+  const isAvailable = useMemo(() => availablePaths.includes(coordinate), [availablePaths]);
 
   const handleClick = () => {
     if (isAvailable) {
@@ -47,8 +47,8 @@ const Cell: React.FC<Props> = (props) => {
 
   return (
     <div
-      key={place}
-      id={`${place}`}
+      key={coordinate}
+      id={coordinate}
       onClick={handleClick}
       className={clsx(
         classes.component,
