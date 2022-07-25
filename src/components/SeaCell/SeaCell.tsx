@@ -12,14 +12,21 @@ type Props = {
 
 const SeaCell: React.FC<Props> = (props) => {
   const { cell, cell: { coordinate, withShip } } = props;
-  const { availablePaths, pirates, movePirate, handleSetActivePirate } = useIslandContext();
+  const {
+    activePirate, availablePaths, pirates,
+    movePirate, moveShip, handleSetActivePirate,
+  } = useIslandContext();
 
   const isAvailable = availablePaths.includes(coordinate);
   const piratesHere = pirates.filter((pirate) => pirate.location === coordinate);
 
   const handleClick = () => {
     if (isAvailable) {
-      movePirate(cell);
+      if (activePirate?.location.split('')[0] === '-') {
+        moveShip(cell);
+      } else {
+        movePirate(cell);
+      }
     }
     handleSetActivePirate(undefined);
   }

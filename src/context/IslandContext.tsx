@@ -16,6 +16,7 @@ type ContextType = {
   handleSetActivePirate: (pirate?: PirateType) => void;
   setPirates: (pirates: PirateType[]) => void;
   movePirate: (cell: CellType | SeaCell) => void;
+  moveShip: (nextCell: SeaCell) => void;
   pickUpCoin: (cell: CellType) => void;
   throwCoin: (pirate: PirateType) => void;
 };
@@ -83,6 +84,27 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     }
   };
 
+  const moveShip = (nextCell: SeaCell) => {
+    const prevCellCoordinate = activePirate?.location || '';
+    const ship = +prevCellCoordinate?.split('-')[1] === 0 ? 0 : 1;
+
+    const newSeaSide = [...sea[ship]].map((seaCell) => {
+      if (seaCell.coordinate === nextCell.coordinate) {
+        return { ...seaCell, withShip: true };
+      }
+      if (seaCell.coordinate === prevCellCoordinate) {
+        return { ...seaCell, withShip: false };
+      }
+      return seaCell;
+    });
+
+    setSea(sea.map((seaSide, key) => key === ship ? newSeaSide : seaSide));
+    setPirates(pirates.map((pirate) => pirate.location === prevCellCoordinate
+      ? { ...pirate, location: nextCell.coordinate }
+      : pirate
+    ));
+  }
+
   const pickUpCoin = (cell: CellType) => {
     if (!activePirate || activePirate.withCoin) {
       return;
@@ -122,6 +144,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     handleSetActivePirate,
     setPirates,
     movePirate,
+    moveShip,
     pickUpCoin,
     throwCoin,
   }

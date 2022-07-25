@@ -1,12 +1,18 @@
 import SeaCell from '../../types/SeaCell';
 
 const getAvailablePaths = (currentCell: string, size: number, sea: SeaCell[][]): string[] => { // 12, 5
+  const availablePaths: string[] = [];
+
   if (currentCell.split('')[0] === '-') {
-    return [currentCell.split('-')[2]];
+    const coords = currentCell.split('-');
+    availablePaths.push(`-${coords[1]}-${+coords[2] - 1}`);
+    availablePaths.push(`-${coords[1]}-${+coords[2] + 1}`);
+    availablePaths.push(coords[2]);
+    return availablePaths;
   }
+
   const x = +currentCell % size; // 2
   const y = Math.floor(+currentCell / size); // 2
-  const availablePaths: string[] = [];
 
   const cell = (x: number, y: number) => {
     if (x >= 0 && y >= 0 && x < size && y < size) {
