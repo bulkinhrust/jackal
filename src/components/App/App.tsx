@@ -7,7 +7,7 @@ import Statistic from '../Statistic';
 import { useIslandContext } from '../../context/IslandContext';
 
 const App: React.FC = () => {
-  const { island, sea, pirates, gold, turn } = useIslandContext();
+  const { island, sea, pirates, gold, turn, activePirate } = useIslandContext();
 
   return (
     <div className={classes.component}>
@@ -15,6 +15,7 @@ const App: React.FC = () => {
         pirates={pirates.filter(({ team }) => team === 1)}
         gold={gold[1]}
         yourTurn={turn === 1}
+        activePirateName={activePirate?.name}
       />
       <div className={classes.field}>
         {sea[0].map((cell) => (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
         pirates={pirates.filter(({ team }) => team === 2)}
         gold={gold[2]}
         yourTurn={turn === 2}
+        activePirateName={activePirate?.name}
       />
     </div>
   );

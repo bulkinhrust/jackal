@@ -66,7 +66,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       setAvailablePaths([]);
     } else {
       setActivePirate(pirate);
-      setAvailablePaths(getAvailablePaths(pirate.location, size, sea))
+      setAvailablePaths(getAvailablePaths(pirate, size, sea))
     }
   };
 

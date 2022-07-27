@@ -1,6 +1,8 @@
 import SeaCell from '../../types/SeaCell';
+import Pirate from '../../types/Pirate';
 
-const getAvailablePaths = (currentCell: string, size: number, sea: SeaCell[][]): string[] => { // 12, 5
+const getAvailablePaths = (pirate: Pirate, size: number, sea: SeaCell[][]): string[] => { // 12, 5
+  const currentCell = pirate.location;
   const availablePaths: string[] = [];
 
   if (currentCell.split('')[0] === '-') {
@@ -20,7 +22,7 @@ const getAvailablePaths = (currentCell: string, size: number, sea: SeaCell[][]):
     }
   }
 
-  if (y === 0 || y === size - 1) {
+  if ((y === 0 && pirate.team === 1) || (y === size - 1 && pirate.team === 2)) {
     const key = y === 0 ? 0 : 1;
     const ship = sea[key].find((seaCell) => seaCell.withShip) as SeaCell;
     const shipCoordinate = ship?.coordinate.split('-')[2];
