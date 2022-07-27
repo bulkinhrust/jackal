@@ -15,6 +15,7 @@ type ContextType = {
   pirates: PirateType[];
   availablePaths: string[];
   gold: { 1: number, 2: number };
+  turn: 1 | 2;
   handleSetActivePirate: (pirate?: PirateType) => void;
   setPirates: (pirates: PirateType[]) => void;
   movePirate: (cell: CellType | SeaCell) => void;
@@ -36,6 +37,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const [pirates, setPirates] = useState<PirateType[]>(initialPirates);
   const [availablePaths, setAvailablePaths] = useState<string[]>([]);
   const [gold, setGold] = useState<{ 1: number, 2: number }>({ 1: 0, 2: 0 });
+  const [turn, setTurn] = useState<1 | 2>(1);
 
   useEffect(() => {
     const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
@@ -89,6 +91,8 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
         : islandCell
       ))
     }
+
+    setTurn(activePirate?.team === 1 ? 2 : 1);
   };
 
   const moveShip = (nextCell: SeaCell) => {
@@ -110,6 +114,8 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...pirate, location: nextCell.coordinate }
       : pirate
     ));
+
+    setTurn(activePirate?.team === 1 ? 2 : 1);
   }
 
   const pickUpCoin = (cell: CellType) => {
@@ -150,6 +156,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     pirates,
     availablePaths,
     gold,
+    turn,
     handleSetActivePirate,
     setPirates,
     movePirate,
