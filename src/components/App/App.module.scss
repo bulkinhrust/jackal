@@ -1,4 +1,10 @@
 .component {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.field {
   margin: auto;
   display: grid;
   grid-template-columns: repeat(5, 1fr);

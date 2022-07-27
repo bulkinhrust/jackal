@@ -3,6 +3,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import PirateType from '../types/Pirate';
 import getAvailablePaths from './utils/getAvailablePaths';
 import fillFieldWithValue from './utils/fillFieldWithValue';
+import { initialPirates } from './constants';
 import CellType from '../types/Cell';
 import SeaCell from '../types/SeaCell';
 
@@ -13,6 +14,7 @@ type ContextType = {
   activePirate?: PirateType;
   pirates: PirateType[];
   availablePaths: string[];
+  gold: { 1: number, 2: number };
   handleSetActivePirate: (pirate?: PirateType) => void;
   setPirates: (pirates: PirateType[]) => void;
   movePirate: (cell: CellType | SeaCell) => void;
@@ -22,12 +24,6 @@ type ContextType = {
 };
 
 const IslandContext = React.createContext<ContextType>({} as ContextType);
-
-const initialPirates = [
-  { name: 'Jon', location: '0', color: '#200772' },
-  { name: 'Jane', location: '24', color: '#A64B00' },
-  { name: 'Jack', location: '11', color: '#006363' },
-];
 
 const TREASURE = 8; // 1
 const CANNIBAL = 2; // -1
@@ -39,6 +35,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const [activePirate, setActivePirate] = useState<PirateType>();
   const [pirates, setPirates] = useState<PirateType[]>(initialPirates);
   const [availablePaths, setAvailablePaths] = useState<string[]>([]);
+  const [gold, setGold] = useState<{ 1: number, 2: number }>({ 1: 0, 2: 0 });
 
   useEffect(() => {
     const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
@@ -72,8 +69,18 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   };
 
   const movePirate = (cell: CellType | SeaCell) => {
+    const newPirate: Partial<PirateType> = { location: cell.coordinate };
+
+    if (activePirate?.withCoin && (cell as SeaCell).withShip) {
+      setGold({
+        ...gold,
+        [activePirate.team]: gold[activePirate.team] + 1,
+      });
+      newPirate.withCoin = false;
+    }
+
     setPirates(pirates.map((pirate) => (pirate.name === activePirate?.name
-      ? { ...pirate, location: cell.coordinate }
+      ? { ...pirate, ...newPirate }
       : pirate
     )));
     if ((cell as CellType).isClosed) {
@@ -117,6 +124,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...pirate, withCoin: true }
       : pirate
     ));
+    setActivePirate({ ...activePirate, withCoin: true });
     setIsland(island.map((islandCell) => islandCell.coordinate === cell.coordinate
       ? { ...islandCell, coins: islandCell.coins - 1 }
       : islandCell
@@ -141,6 +149,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     activePirate,
     pirates,
     availablePaths,
+    gold,
     handleSetActivePirate,
     setPirates,
     movePirate,
