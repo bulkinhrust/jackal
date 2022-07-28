@@ -16,9 +16,6 @@ const Pirate: React.FC<Props> = (props) => {
   const handleClick: React.MouseEventHandler = (e) => {
     e.stopPropagation();
     if (turn !== pirate.team) return;
-    if (activePirate?.name !== pirate.name && ref.current) {
-      ref.current.focus();
-    }
     handleSetActivePirate(pirate);
   };
 
