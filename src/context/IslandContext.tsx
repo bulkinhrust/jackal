@@ -66,7 +66,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       setAvailablePaths([]);
     } else {
       setActivePirate(pirate);
-      setAvailablePaths(getAvailablePaths(pirate, size, sea))
+      setAvailablePaths(getAvailablePaths(pirate, size, island, sea))
     }
   };
 
@@ -156,6 +156,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...islandCell, coins: islandCell.coins - 1 }
       : islandCell
     ));
+    setAvailablePaths(availablePaths.filter((path) => isNaN(+path) || !island[+path]?.isClosed));
   }
 
   const throwCoin = (currentPirate: PirateType) => {
@@ -163,6 +164,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       ? { ...pirate, withCoin: false }
       : pirate
     ));
+    setActivePirate({ ...currentPirate, withCoin: false });
     setIsland(island.map((islandCell) => islandCell.coordinate === currentPirate.location
       ? { ...islandCell, coins: islandCell.coins + 1 }
       : islandCell
