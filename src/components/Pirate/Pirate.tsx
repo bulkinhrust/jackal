@@ -10,19 +10,18 @@ type Props = {
 
 const Pirate: React.FC<Props> = (props) => {
   const { pirate } = props;
-  const { activePirate, handleSetActivePirate, throwCoin } = useIslandContext();
+  const { activePirate, turn, handleSetActivePirate, throwCoin } = useIslandContext();
   const ref = useRef<HTMLDivElement>(null);
 
   const handleClick: React.MouseEventHandler = (e) => {
     e.stopPropagation();
-    if (activePirate?.name !== pirate.name && ref.current) {
-      ref.current.focus();
-    }
+    if (turn !== pirate.team) return;
     handleSetActivePirate(pirate);
   };
 
   const handleClickCoin: React.MouseEventHandler = (e) => {
     e.stopPropagation();
+    if (turn !== pirate.team) return;
     throwCoin(pirate);
   }
 
