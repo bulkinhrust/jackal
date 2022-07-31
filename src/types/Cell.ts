@@ -1,8 +1,8 @@
 type CellType = {
-  coordinate: string,
-  value: number,
-  isClosed: boolean,
-  coins: number,
+  coordinate: string;
+  value: number;
+  isClosed: boolean;
+  coins: number;
 };
 
 export default CellType;
