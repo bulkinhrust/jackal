@@ -52,7 +52,7 @@ const Cell: React.FC<Props> = (props) => {
       onClick={handleClick}
       className={clsx(
         classes.component,
-        classes[style[`${value}`]],
+        classes[isClosed ? '' : style[`${value}`]],
         classes[isClosed ? 'closed' : ''],
         classes[isAvailable ? 'available' : ''],
       )}

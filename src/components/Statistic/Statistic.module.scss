@@ -19,3 +19,25 @@
   font-size: 20px;
   font-weight: bold;
 }
+
+@mixin dead {
+  content: "";
+  position: absolute;
+  top: 48px;
+  left: 0;
+  width: 98px;
+  height: 0;
+  border-top: 1px solid red;
+}
+
+.dead {
+  position: relative;
+  &::before {
+    @include dead;
+    transform: rotate(45deg);
+  }
+  &::after {
+    @include dead;
+    transform: rotate(-45deg);
+  }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 
 import classes from './Statistic.module.scss';
 import PirateType from '../../types/Pirate';
@@ -19,7 +20,7 @@ const Statistic: React.FC<Props> = (props) => {
       {pirates.map((pirate) => (
         <div
           key={pirate.name}
-          className={classes.pirate}
+          className={clsx(classes.pirate, pirate.location === 'dead' ? classes.dead : '')}
           style={{ border: `${activePirateName === pirate.name ? 3 : 1}px solid ${pirates[0].color}` }}
         >
           {pirate.name}
