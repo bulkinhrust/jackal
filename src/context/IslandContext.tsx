@@ -1,4 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import cloneDeep from 'lodash/cloneDeep';
 
 import PirateType from '../types/Pirate';
 import getAvailablePaths from './utils/getAvailablePaths';
@@ -6,6 +7,7 @@ import fillFieldWithValue from './utils/fillFieldWithValue';
 import { initialPirates } from './constants';
 import CellType from '../types/Cell';
 import SeaCell from '../types/SeaCell';
+import Content from '../types/Content';
 
 type ContextType = {
   island: CellType[];
@@ -26,8 +28,10 @@ type ContextType = {
 
 const IslandContext = React.createContext<ContextType>({} as ContextType);
 
-const TREASURE = 8; // 1
-const CANNIBAL = 2; // -1
+const contents: Content[] = [
+  {  name: 'treasure', count: 8, value: 1 },
+  {  name: 'cannibal', count: 2, value: -1 },
+];
 
 export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const size = 5;
@@ -40,16 +44,16 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   const [turn, setTurn] = useState<1 | 2>(1);
 
   useEffect(() => {
-    const result: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
+    const initIsland: CellType[] = new Array(size * size).fill(0).map((_, key) => ({
       coordinate: `${key}`,
       value: 0,
       isClosed: true,
       coins: 0,
     }));
-    // наполнение поля сокровищами
-    fillFieldWithValue(TREASURE, 1, result, size);
-    // наполнение поля людоедами
-    fillFieldWithValue(CANNIBAL, -1, result, size);
+
+    contents.forEach((content) => {
+      fillFieldWithValue(content, initIsland, size);
+    })
 
     const initSea = (ship: number) => new Array(size).fill(0).map((_, key) => ({
       coordinate: `-${ship}-${size * ship + key}`,
@@ -57,7 +61,7 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
     }));
 
     setSea([initSea(0), initSea(size - 1)]);
-    setIsland(result);
+    setIsland(initIsland);
   }, []); // eslint-disable react-hooks/exhaustive-deps
 
   const handleSetActivePirate = (pirate?: PirateType) => {
@@ -66,52 +70,59 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
       setAvailablePaths([]);
     } else {
       setActivePirate(pirate);
-      setAvailablePaths(getAvailablePaths(pirate, size, island, sea))
+      setAvailablePaths(getAvailablePaths(pirate, size, island, sea));
     }
   };
 
-  const flyPirateFly = (pirate: PirateType) => {
-    const ship = sea[pirate.team === 1 ? 0 : 1].find(({ withShip }) => withShip);
-    if (pirate.withCoin) {
-      setIsland((prevIsland) => prevIsland.map((islandCell) => islandCell.coordinate === pirate.location
-        ? { ...islandCell, coins: islandCell.coins + 1 }
-        : islandCell
-      ));
-    }
-    return { ...pirate, location: `${ship?.coordinate}`, withCoin: false };
-  }
-
   const movePirate = (cell: CellType | SeaCell) => {
-    const newPirate: Partial<PirateType> = { location: cell.coordinate };
-
-    // Перенос золота на корабль, пополнение казны
-    if (activePirate?.withCoin && (cell as SeaCell).withShip) {
-      setGold({
-        ...gold,
-        [activePirate.team]: gold[activePirate.team] + 1,
-      });
-      newPirate.withCoin = false;
+    if (!activePirate) {
+      return;
     }
+    const newPirates: PirateType[] = cloneDeep(pirates);
+    const newIsland: CellType[] = cloneDeep(island);
 
-    // Перемещение активного пирата
-    setPirates(pirates.map((pirate) => {
-      if (pirate.name === activePirate?.name) {
-        return { ...pirate, ...newPirate };
-      }
-      if (pirate.location === cell.coordinate && pirate.team !== activePirate?.team) {
-        // Пираты вражеской команды улетают на свой корабль
-        return flyPirateFly(pirate);
-      }
-      return pirate;
-    }));
+    const pirateIndex = newPirates.findIndex(({ name }) => name === activePirate.name);
+    const nextCellIndex = island.findIndex(({ coordinate }) => coordinate === cell.coordinate);
+    const prevCellIndex = island.findIndex(({ coordinate }) => coordinate === activePirate.location);
+
+    const currentPirate = newPirates[pirateIndex];
+    currentPirate.location = cell.coordinate;
 
     // Открытие закрытой клетки
     if ((cell as CellType).isClosed) {
-      setIsland(island.map((islandCell) => islandCell.coordinate === cell.coordinate
-        ? { ...islandCell, isClosed: false }
-        : islandCell
-      ))
+      newIsland[nextCellIndex].isClosed = false;
     }
+
+    // Cannibal!!
+    if ((cell as CellType).value === -1) {
+      if (currentPirate.withCoin) {
+        newIsland[prevCellIndex].coins += 1;
+      }
+      currentPirate.withCoin = false;
+      currentPirate.location = 'dead';
+    }
+
+    // Перенос золота на корабль, пополнение казны
+    if (currentPirate.withCoin && (cell as SeaCell).withShip) {
+      setGold({ ...gold, [currentPirate.team]: gold[currentPirate.team] + 1 });
+      currentPirate.withCoin = false;
+    }
+
+    // проверка наличия врагов на клетке
+    const enemies = newPirates.filter(({ location, team }) => location === cell.coordinate && team !== currentPirate.team);
+    if (enemies.length > 0) {
+      const ship = sea[currentPirate.team === 1 ? 1 : 0].find(({ withShip }) => withShip);
+      enemies.forEach((enemy) => {
+        if (enemy.withCoin) {
+          newIsland[nextCellIndex].coins += 1;
+        }
+        enemy.withCoin = false;
+        enemy.location = ship?.coordinate || '';
+      });
+    }
+
+    setIsland(newIsland);
+    setPirates(newPirates);
 
     setTurn(activePirate?.team === 1 ? 2 : 1);
   };
@@ -160,15 +171,17 @@ export const IslandProvider: React.FC<React.PropsWithChildren> = ({ children }) 
   }
 
   const throwCoin = (currentPirate: PirateType) => {
+    const newPirate = { ...currentPirate, withCoin: false };
     setPirates(pirates.map((pirate) => pirate.name === currentPirate.name
-      ? { ...pirate, withCoin: false }
+      ? newPirate
       : pirate
     ));
-    setActivePirate({ ...currentPirate, withCoin: false });
+    setActivePirate(newPirate);
     setIsland(island.map((islandCell) => islandCell.coordinate === currentPirate.location
       ? { ...islandCell, coins: islandCell.coins + 1 }
       : islandCell
     ));
+    setAvailablePaths(getAvailablePaths(newPirate, size, island, sea));
   }
 
   const value = {

@@ -1,7 +1,8 @@
 import CellType from '../../types/Cell';
+import Content from '../../types/Content';
 
-const fillFieldWithValue = (fieldsNumber: number, value: number, fieldArray: CellType[], size: number) => {
-  for (let i = 0; i < fieldsNumber;) {
+const fillFieldWithValue = (content: Content, fieldArray: CellType[], size: number) => {
+  for (let i = 0; i < content.count;) {
     const x = Math.floor(Math.random() * size);
     const y = Math.floor(Math.random() * size);
     const key = y * size + x;
@@ -10,8 +11,8 @@ const fillFieldWithValue = (fieldsNumber: number, value: number, fieldArray: Cel
     }
     fieldArray[key] = {
       ...fieldArray[key],
-      value,
-      coins: value === 1 ? 1 : 0,
+      value: content.value,
+      coins: content.value === 1 ? 1 : 0,
     };
     ++i;
   }
